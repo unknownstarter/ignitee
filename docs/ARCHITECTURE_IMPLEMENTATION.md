@@ -1,7 +1,8 @@
 # 🏗️ Ignitee 아키텍처 구현 문서
 
 **구현 일자**: 2024-01-15  
-**문서 버전**: v1.0  
+**문서 버전**: v1.1  
+**최종 업데이트**: 2024-12-19  
 **구현자**: Ignitee Development Team
 
 ## 📋 개요
@@ -97,30 +98,39 @@ apps/api/
 - `tsconfig.json`: TypeScript 설정
 - `nest-cli.json`: NestJS CLI 설정
 
-### 2. 멀티 에이전트 오케스트레이터 (`services/agent-orchestrator`)
+### 2. Agent Orchestrator 서비스 (`services/agent-orchestrator`) - v1.1 업데이트
 
-#### 에이전트 구성
+#### 새로운 아키텍처 (2024-12-19)
 ```typescript
-// 6개의 전문 에이전트
-- StrategistAgent: PRD 분석 및 도메인 식별
-- TargetAnalystAgent: 페르소나 및 타겟 분석
-- ChannelPlannerAgent: 채널 믹스 및 전략 수립
-- ContentMakerAgent: 콘텐츠 계획 및 생성
-- EngagementAgent: 참여도 모니터링
-- FeedbackAgent: 피드백 분석 및 개선
+// Express.js 기반 단순화된 아키텍처
+- Express.js 서버 (포트 3002)
+- OpenAI GPT-4 직접 연동
+- CORS 설정으로 웹 앱과 통신
+- 환경 변수 기반 설정
 ```
 
-#### LangGraph 워크플로우
+#### 주요 변경사항
+- **LangGraph.js 제거**: 호환성 문제로 인한 제거
+- **직접 OpenAI 호출**: Supabase Edge Functions 대체
+- **일반 채팅 지원**: PRD 분석과 일반 채팅 구분
+- **컨텍스트 유지**: 대화 히스토리 기반 응답
+
+#### API 엔드포인트
 ```typescript
-PRD_SUBMITTED → ANALYZING → STRATEGY_READY → 
-CONTENT_PLAN_READY → CONTENT_POSTED → METRICS_INGESTED
+POST /api/analyze          // PRD 분석 및 일반 채팅
+POST /api/generate-strategy // 원페이저 전략 생성
+POST /api/generate-content  // 실행 캘린더 생성
 ```
 
-#### 주요 기능
-- **상태 관리**: MemorySaver를 통한 워크플로우 상태 저장
-- **이벤트 기반**: 각 단계별 이벤트 발행
-- **에러 처리**: 각 노드별 에러 핸들링
-- **확장성**: 새로운 에이전트 추가 용이
+#### AI 역할 설정
+```typescript
+// 마케팅 전문가 역할
+- 마케팅 전문가
+- 홍보 전문가  
+- PR 전문가
+- 커뮤니티 운영 전문가
+- 커뮤니티 마케팅 전문가
+```
 
 ### 3. 도메인 모델 (`packages/domain`)
 
@@ -255,12 +265,15 @@ audit_log (id, table_name, record_id, action, old_values, new_values, user_id, c
 
 ### 개발 환경 실행
 ```bash
-# 모든 서비스 실행 (권장)
-pnpm dev:all
+# 웹 앱 실행
+cd apps/web && npm run dev  # 포트 3001
+
+# Agent Orchestrator 실행
+cd services/agent-orchestrator && OPENAI_API_KEY=your_key npm run dev  # 포트 3002
 
 # 또는 개별 실행
 pnpm dev                    # 웹 앱 (Next.js)
-pnpm dev:api               # API 서버 (NestJS)
+pnpm dev:api               # API 서버 (NestJS) - Legacy
 pnpm dev:agent            # 에이전트 오케스트레이터
 ```
 
@@ -417,7 +430,7 @@ pnpm start:agent         # 에이전트 오케스트레이터
 ---
 
 **문서 작성일**: 2024-01-15  
-**최종 업데이트**: 2024-01-15  
+**최종 업데이트**: 2024-12-19  
 **문서 작성자**: Ignitee Development Team  
 **검토자**: Ignitee Architecture Team
 

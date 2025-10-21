@@ -13,11 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    const { strategy, platform, count = 5 } = await req.json();
+    const { prd, action } = await req.json();
     
-    if (!strategy || !platform) {
+    if (!prd || typeof prd !== 'string') {
       return new Response(
-        JSON.stringify({ error: 'Strategy and platform are required' }),
+        JSON.stringify({ error: 'PRD is required and must be a string' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -34,45 +34,59 @@ serve(async (req) => {
       messages: [
         { 
           role: "system", 
-          content: `당신은 전문적인 콘텐츠 크리에이터입니다.
-          주어진 전략을 바탕으로 ${platform} 플랫폼용 콘텐츠를 생성해주세요.
-          다음 JSON 배열 형태로 응답해주세요:
-          [
-            {
-              "platform": "${platform}",
-              "title": "매력적인 콘텐츠 제목",
-              "description": "콘텐츠에 대한 상세 설명",
-              "type": "educational|entertainment|behind-scenes|promotional",
-              "hashtags": ["관련 해시태그들"],
-              "callToAction": "행동 유도 문구"
+          content: `당신은 전문적인 마케팅 실행 계획 수립자입니다.
+          주어진 PRD를 바탕으로 실행 가능한 마케팅 캘린더를 생성해주세요.
+          다음 JSON 구조로 응답해주세요:
+          {
+            "timeline": [
+              {
+                "phase": "1단계: 준비 및 기반 구축",
+                "duration": "4주",
+                "tasks": [
+                  {
+                    "task": "구체적인 작업명",
+                    "description": "작업에 대한 상세 설명",
+                    "deliverable": "산출물",
+                    "owner": "담당자",
+                    "dependencies": ["선행 작업들"]
+                  }
+                ]
+              }
+            ],
+            "milestones": [
+              {
+                "milestone": "마일스톤명",
+                "date": "예상 완료일",
+                "success_metrics": ["성공 지표들"],
+                "risks": ["위험 요소들"]
+              }
+            ],
+            "resources": {
+              "team": ["필요한 팀원들"],
+              "budget": "예상 예산",
+              "tools": ["필요한 도구들"]
             }
-          ]
-          
-          각 플랫폼의 특성을 고려해주세요:
-          - YouTube: 교육적이고 긴 형태의 콘텐츠
-          - Instagram: 시각적이고 짧은 형태의 콘텐츠
-          - TikTok: 트렌디하고 재미있는 짧은 콘텐츠
-          - LinkedIn: 전문적이고 비즈니스 중심의 콘텐츠`
+          }`
         },
         { 
           role: "user", 
-          content: `다음 전략을 바탕으로 ${platform}용 콘텐츠 ${count}개를 생성해주세요:\n\n${JSON.stringify(strategy, null, 2)}` 
+          content: `다음 PRD를 바탕으로 실행 캘린더를 생성해주세요:\n\n${prd}` 
         }
       ],
-      temperature: 0.4,
-      max_tokens: 2000,
+      temperature: 0.3,
+      max_tokens: 3000,
     });
 
-    const contentText = completion.choices[0].message.content ?? "[]";
+    const calendarText = completion.choices[0].message.content ?? "{}";
     
     // JSON 파싱 검증
-    let contents;
+    let calendar;
     try {
-      contents = JSON.parse(contentText);
+      calendar = JSON.parse(calendarText);
     } catch (error) {
-      console.error('Failed to parse OpenAI response:', contentText);
+      console.error('Failed to parse OpenAI response:', calendarText);
       return new Response(
-        JSON.stringify({ error: 'Failed to parse content result' }),
+        JSON.stringify({ error: 'Failed to parse calendar result' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -81,7 +95,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify(contents),
+      JSON.stringify(calendar),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       }

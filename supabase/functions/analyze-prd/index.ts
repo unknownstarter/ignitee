@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { prd } = await req.json();
+    const { prd, conversationHistory = [] } = await req.json();
     
     if (!prd || typeof prd !== 'string') {
       return new Response(
@@ -29,13 +29,20 @@ serve(async (req) => {
       apiKey: Deno.env.get("OPENAI_API_KEY")! 
     });
 
+    // 대화 히스토리를 메시지 배열로 변환
+    const historyMessages = conversationHistory.map((msg: any) => ({
+      role: msg.type === 'user' ? 'user' : 'assistant',
+      content: msg.content
+    }));
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { 
           role: "system", 
           content: `당신은 전문적인 GTM 전략가입니다. 
-          주어진 PRD를 분석하여 다음 JSON 구조로 응답해주세요:
+          이전 대화 내용을 참고하여 PRD를 분석하고, 사용자의 추가 질문이나 요청에 맞춰 응답해주세요.
+          다음 JSON 구조로 응답해주세요:
           {
             "domain": "제품 도메인 (예: Creator SaaS, E-commerce, Fintech)",
             "personas": [
@@ -57,9 +64,10 @@ serve(async (req) => {
             ]
           }`
         },
+        ...historyMessages,
         { 
           role: "user", 
-          content: `다음 PRD를 분석해주세요:\n\n${prd}` 
+          content: `다음 PRD를 분석해주세요 (이전 대화 내용을 참고하여):\n\n${prd}` 
         }
       ],
       temperature: 0.2,

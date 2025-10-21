@@ -1,5 +1,4 @@
 {
-  "extends": null,
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -7,11 +6,11 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@domain/*": ["packages/domain/src/*"],
-      "@use-cases/*": ["packages/use-cases/src/*"],
-      "@ports/*": ["packages/ports/src/*"],
-      "@adapters/*": ["packages/adapters/src/*"],
-      "@shared/*": ["packages/shared/src/*"]
+      "@ignitee/domain/*": ["packages/domain/src/*"],
+      "@ignitee/use-cases/*": ["packages/use-cases/src/*"],
+      "@ignitee/ports/*": ["packages/ports/src/*"],
+      "@ignitee/adapters/*": ["packages/adapters/src/*"],
+      "@ignitee/shared/*": ["packages/shared/src/*"]
     }
   }
 }

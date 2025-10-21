@@ -19,6 +19,87 @@
 
 ---
 
+## [1.1.0] - 2024-12-19
+
+### 🎉 Major UI/UX Improvements & Agent Orchestrator Implementation
+
+#### Added
+- **Agent Orchestrator 서비스**
+  - Express.js 기반 독립 서비스 구현
+  - OpenAI GPT-4 직접 연동 (Supabase Edge Functions 대체)
+  - 일반 채팅과 PRD 분석 구분 로직
+  - 대화 히스토리 컨텍스트 유지 기능
+  - 포트 3002에서 실행되는 독립 서버
+
+- **향상된 채팅 인터페이스**
+  - 랜딩 페이지에서 채팅 화면으로 전환 기능
+  - 로고 클릭으로 랜딩 페이지 복귀 기능
+  - 액션 버튼 (더 자세한 분석, 원페이저 전략 구성, 실행 캘린더 제작)
+  - 복사 기능 (포지셔닝, 핵심 메시지, 채널 믹스, 타임라인, 마일스톤, 리소스)
+  - 조건부 액션 버튼 표시 (초기 분석 후에만 표시)
+
+- **마크다운 스타일 렌더링**
+  - HTML 태그 대신 마크다운 스타일 적용
+  - `**굵은 글씨**`, `• 리스트`, `1. 번호` 형식 지원
+  - 깔끔한 텍스트 기반 렌더링
+
+#### Changed
+- **CSS 프레임워크 완전 제거**
+  - Tailwind CSS 완전 제거 (에러 방지)
+  - UnoCSS 제거 (호환성 문제)
+  - 인라인 스타일로 전환
+  - PostCSS 설정 제거
+
+- **Agent Orchestrator 아키텍처**
+  - LangGraph.js 제거 (호환성 문제)
+  - 직접 OpenAI API 호출로 단순화
+  - Express.js + CORS 설정
+  - 환경 변수 기반 설정
+
+- **API 엔드포인트 개선**
+  - `/api/analyze` - PRD 분석 및 일반 채팅
+  - `/api/generate-strategy` - 원페이저 전략 생성
+  - `/api/generate-content` - 실행 캘린더 생성
+  - 강화된 에러 처리 (JSON 파싱 오류 방지)
+
+#### Fixed
+- **HTML 렌더링 문제 해결**
+  - HTML 태그가 텍스트로 표시되는 문제 완전 해결
+  - `dangerouslySetInnerHTML` 대신 React 컴포넌트 직접 렌더링
+  - 마크다운 스타일로 안정적인 렌더링
+
+- **중복 메시지 방지**
+  - `hasInitialized` 플래그로 초기화 중복 방지
+  - `isProcessingRef`로 동시 API 호출 방지
+  - 고유 메시지 ID 생성
+
+- **이벤트 버블링 문제**
+  - 액션 버튼 클릭 시 랜딩 페이지로 돌아가는 문제 해결
+  - `event.stopPropagation()` 적용
+
+- **컨텍스트 손실 문제**
+  - 대화 히스토리를 모든 API 호출에 포함
+  - AI가 이전 대화 내용을 기억하도록 개선
+
+#### Technical Details
+- **Agent Orchestrator**: Express.js + OpenAI GPT-4
+- **프론트엔드**: Next.js + 인라인 스타일
+- **AI 역할 설정**: 마케팅 전문가, 홍보 전문가, PR 전문가, 커뮤니티 운영 전문가
+- **렌더링**: 마크다운 스타일 텍스트 기반
+- **상태 관리**: React useState, useRef, useEffect
+
+#### Breaking Changes
+- Tailwind CSS 완전 제거로 인한 스타일링 방식 변경
+- Supabase Edge Functions 대신 Agent Orchestrator 사용
+- HTML 태그 기반 렌더링에서 마크다운 스타일로 변경
+
+#### Migration Guide
+- 기존 Tailwind CSS 클래스는 인라인 스타일로 변환됨
+- Supabase Edge Functions는 Agent Orchestrator로 대체됨
+- HTML 태그는 마크다운 스타일로 변환됨
+
+---
+
 ## [1.0.0] - 2024-01-15
 
 ### 🎉 Initial Release

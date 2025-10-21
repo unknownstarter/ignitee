@@ -13,11 +13,11 @@ serve(async (req) => {
   }
 
   try {
-    const { analysis } = await req.json();
+    const { prd, action, conversationHistory = [] } = await req.json();
     
-    if (!analysis) {
+    if (!prd || typeof prd !== 'string') {
       return new Response(
-        JSON.stringify({ error: 'Analysis data is required' }),
+        JSON.stringify({ error: 'PRD is required and must be a string' }),
         { 
           status: 400, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -29,13 +29,19 @@ serve(async (req) => {
       apiKey: Deno.env.get("OPENAI_API_KEY")! 
     });
 
+    // 대화 히스토리를 메시지 배열로 변환
+    const historyMessages = conversationHistory.map((msg: any) => ({
+      role: msg.type === 'user' ? 'user' : 'assistant',
+      content: msg.content
+    }));
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { 
           role: "system", 
           content: `당신은 전문적인 GTM 전략가입니다. 
-          주어진 분석 결과를 바탕으로 실행 가능한 GTM 전략을 수립해주세요.
+          이전 대화 내용과 분석 결과를 참고하여 실행 가능한 GTM 전략을 수립해주세요.
           다음 JSON 구조로 응답해주세요:
           {
             "positioning": {
@@ -62,9 +68,10 @@ serve(async (req) => {
             ]
           }`
         },
+        ...historyMessages,
         { 
           role: "user", 
-          content: `다음 분석 결과를 바탕으로 GTM 전략을 수립해주세요:\n\n${JSON.stringify(analysis, null, 2)}` 
+          content: `다음 PRD를 바탕으로 GTM 전략을 수립해주세요 (이전 대화 내용을 참고하여):\n\n${prd}` 
         }
       ],
       temperature: 0.3,

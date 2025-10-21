@@ -1,11 +1,11 @@
 {
-  "name": "@adapters/adapters",
+  "name": "@ignitee/adapters",
   "version": "1.0.0",
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {
-    "@domain/domain": "workspace:*",
-    "@ports/ports": "workspace:*",
+    "@ignitee/domain": "workspace:*",
+    "@ignitee/ports": "workspace:*",
     "@supabase/supabase-js": "^2.45.0"
   }
 }

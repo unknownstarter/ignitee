@@ -1,0 +1,35 @@
+{
+  "name": "ignitee",
+  "version": "1.0.0",
+  "description": "PRD to GTM Strategy Platform - TypeScript Monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api start:dev",
+    "dev:agent": "pnpm --filter agent-orchestrator dev",
+    "build": "pnpm --filter web build && pnpm --filter api build && pnpm --filter agent-orchestrator build",
+    "start": "pnpm --filter web start",
+    "start:api": "pnpm --filter api start:prod",
+    "start:agent": "pnpm --filter agent-orchestrator start",
+    "lint": "pnpm --filter web lint && pnpm --filter api lint",
+    "test": "pnpm --filter web test && pnpm --filter api test",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:db:push": "supabase db push",
+    "supabase:functions:deploy": "supabase functions deploy",
+    "supabase:functions:logs": "supabase functions logs",
+    "clean": "rm -rf node_modules && rm -rf apps/*/node_modules && rm -rf packages/*/node_modules && rm -rf services/*/node_modules",
+    "type-check": "pnpm --filter web type-check && pnpm --filter api type-check && pnpm --filter agent-orchestrator type-check",
+    "dev:all": "concurrently \"pnpm dev\" \"pnpm dev:api\" \"pnpm dev:agent\""
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5",
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}
